@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تطبيق محاسبة متكامل</title>
+  <style>
+    /* تنسيق CSS الأساسي للتطبيق */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      direction: rtl;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2, h3 {
+      margin: 10px 0;
+    }
+    .menu {
+      background-color: #007acc;
+      padding: 10px;
+    }
+    .menu button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #005f99;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .menu button:hover {
+      background-color: #004c80;
+    }
+    .section {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+    }
+    .active {
+      display: block;
+    }
+    table {
+      width: 90%;
+      margin: auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+    input, select {
+      width: 90%;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>تطبيق محاسبة متكامل</h1>
+  
+  <!-- قائمة الأقسام -->
+  <div class="menu">
+    <button onclick="showSection('items')">الأصناف</button>
+    <button onclick="showSection('accounts')">الحسابات</button>
+    <button onclick="showSection('purchases')">المشتريات</button>
+    <button onclick="showSection('sales')">المبيعات</button>
+    <button onclick="showSection('expenses')">المصاريف</button>
+    <button onclick="showSection('dailyInventory')">الجرد اليومي</button>
+    <button onclick="showSection('reports')">عرض التقرير</button>
+  </div>
+  
+  <!-- قسم الأصناف -->
+  <div id="items" class="section">
+    <h2>الأصناف</h2>
+    <table id="itemsTable">
+      <tr>
+        <th>الاسم</th>
+        <th>سعر الشراء</th>
+        <th>سعر البيع</th>
+        <th>الكمية</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <input id="itemName" placeholder="اسم الصنف" />
+      <input id="purchasePrice" placeholder="سعر الشراء" type="number" />
+      <input id="salePrice" placeholder="سعر البيع" type="number" />
+      <input id="itemQty" placeholder="الكمية" type="number" />
+      <button onclick="addItem()">إضافة صنف</button>
+    </div>
+  </div>
+  
+  <!-- قسم الحسابات -->
+  <div id="accounts" class="section">
+    <h2>الحسابات</h2>
+    <table id="accountsTable">
+      <tr>
+        <th>اسم الحساب</th>
+        <th>له</th>
+        <th>عليه</th>
+        <th>الإجمالي</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <input id="accountName" placeholder="اسم الحساب" />
+      <input id="accountCredit" placeholder="له" type="number" />
+      <input id="accountDebit" placeholder="عليه" type="number" />
+      <button onclick="addAccount()">إضافة حساب</button>
+    </div>
+  </div>
+  
+  <!-- قسم فواتير المشتريات -->
+  <div id="purchases" class="section">
+    <h2>فواتير المشتريات</h2>
+    <table id="purchasesTable">
+      <tr>
+        <th>اسم الحساب</th>
+        <th>النوع</th>
+        <th>الصنف</th>
+        <th>الكمية</th>
+        <th>سعر الشراء</th>
+        <th>الإجمالي</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <input id="purchaseAccount" placeholder="اسم الحساب" />
+      <select id="purchaseType">
+        <option value="نقدا">نقدا</option>
+        <option value="آجل">آجل</option>
+      </select>
+      <input id="purchaseItem" placeholder="الصنف" />
+      <input id="purchaseQty" placeholder="الكمية" type="number" />
+      <input id="purchaseUnit" placeholder="سعر الشراء" type="number" />
+      <button onclick="addPurchase()">إضافة فاتورة</button>
+    </div>
+  </div>
+  
+  <!-- قسم فواتير المبيعات -->
+  <div id="sales" class="section">
+    <h2>فواتير المبيعات</h2>
+    <table id="salesTable">
+      <tr>
+        <th>النوع</th>
+        <th>الصنف</th>
+        <th>الكمية</th>
+        <th>الإجمالي</th>
+        <th>صافي الربح</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <select id="saleType">
+        <option value="نقدا">نقدا</option>
+      </select>
+      <input id="saleItem" placeholder="الصنف" />
+      <input id="saleQty" placeholder="الكمية" type="number" />
+      <button onclick="addSale()">إضافة بيع</button>
+    </div>
+  </div>
+  
+  <!-- قسم المصاريف -->
+  <div id="expenses" class="section">
+    <h2>المصاريف</h2>
+    <table id="expensesTable">
+      <tr>
+        <th>نوع المصروف</th>
+        <th>المبلغ</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <input id="expenseType" placeholder="نوع المصروف" />
+      <input id="expenseAmount" placeholder="المبلغ" type="number" />
+      <button onclick="addExpense()">إضافة مصروف</button>
+    </div>
+  </div>
+  
+  <!-- قسم الجرد اليومي -->
+  <div id="dailyInventory" class="section">
+    <h2>الجرد اليومي</h2>
+    <h3>المبلغ المتبقي في الصندوق</h3>
+    <input id="cashRemaining" placeholder="المبلغ المتبقي" type="number" />
+    <h3>البضاعة المتبقية</h3>
+    <table id="remainingStockTable">
+      <tr>
+        <th>الصنف</th>
+        <th>الكمية</th>
+        <th>الإجمالي</th>
+        <th>الإجراءات</th>
+      </tr>
+    </table>
+    <div>
+      <input id="remainingItem" placeholder="الصنف" />
+      <input id="remainingQty" placeholder="الكمية" type="number" />
+      <button onclick="addRemainingStock()">إضافة</button>
+    </div>
+  </div>
+  
+  <!-- قسم التقرير اليومي -->
+  <div id="reports" class="section">
+    <h2>التقرير اليومي</h2>
+    <p id="salesTotal"></p>
+    <p id="purchasesTotal"></p>
+    <p id="netProfit"></p>
+    <p id="workTotal"></p>
+    <button onclick="generateReport()">عرض التقرير اليومي</button>
+  </div>
+  
+  <script>
+    // مصفوفة تحتوي على معرفات الجداول لحفظ البيانات في localStorage
+    const tables = ["itemsTable", "accountsTable", "purchasesTable", "salesTable", "expensesTable", "remainingStockTable"];
+    
+    // دالة عرض القسم المطلوب
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      console.log("تم عرض القسم: " + id);
+    }
+    
+    // دالة حفظ البيانات في localStorage
+    function saveData() {
+      tables.forEach(id => {
+        localStorage.setItem(id, document.getElementById(id).innerHTML);
+      });
+      localStorage.setItem("cashRemaining", document.getElementById("cashRemaining").value);
+      console.log("تم حفظ البيانات.");
+    }
+    
+    // دالة استرجاع البيانات من localStorage عند تحميل الصفحة
+    function loadData() {
+      tables.forEach(id => {
+        const saved = localStorage.getItem(id);
+        if (saved) {
+          document.getElementById(id).innerHTML = saved;
+        }
+      });
+      document.getElementById("cashRemaining").value = localStorage.getItem("cashRemaining") || "";
+      console.log("تم تحميل البيانات.");
+    }
+    
+    window.onload = loadData;
+    
+    // دوال تعديل وحذف الصفوف
+    function deleteRow(btn) {
+      console.log("تم الضغط على زر الحذف");
+      btn.parentNode.parentNode.remove();
+      saveData();
+    }
+    
+    function editRow(btn) {
+      console.log("تم الضغط على زر التعديل");
+      const row = btn.parentNode.parentNode;
+      for (let i = 0; i < row.cells.length - 1; i++) {
+        const newValue = prompt("أدخل القيمة الجديدة:", row.cells[i].innerText);
+        if (newValue !== null) {
+          row.cells[i].innerText = newValue;
+        }
+      }
+      saveData();
+    }
+    
+    // إضافة صنف إلى جدول الأصناف
+    function addItem() {
+      console.log("addItem triggered");
+      const itemName = document.getElementById("itemName").value;
+      const purchasePrice = document.getElementById("purchasePrice").value;
+      const salePrice = document.getElementById("salePrice").value;
+      const itemQty = document.getElementById("itemQty").value;
+      
+      let row = `<tr>
+          <td>${itemName}</td>
+          <td>${+purchasePrice}</td>
+          <td>${+salePrice}</td>
+          <td>${+itemQty}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("itemsTable").innerHTML += row;
+      saveData();
+    }
+    
+    // إضافة حساب إلى جدول الحسابات
+    function addAccount() {
+      console.log("addAccount triggered");
+      const accountName = document.getElementById("accountName").value;
+      const accountCredit = +document.getElementById("accountCredit").value;
+      const accountDebit = +document.getElementById("accountDebit").value;
+      let total = accountCredit - accountDebit;
+      
+      let row = `<tr>
+          <td>${accountName}</td>
+          <td>${accountCredit}</td>
+          <td>${accountDebit}</td>
+          <td>${total}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("accountsTable").innerHTML += row;
+      saveData();
+    }
+    
+    // تحديث الحسابات (زيادة "له" في حالة البيع أو زيادة "عليه" في حالة الشراء/المصروف)
+    function updateAccount(accountName, isSale, amount) {
+      let table = document.getElementById("accountsTable");
+      let found = false;
+      for (let i = 1; i < table.rows.length; i++) {
+        let row = table.rows[i];
+        if (row.cells[0].innerText === accountName) {
+          found = true;
+          let credit = +row.cells[1].innerText;
+          let debit = +row.cells[2].innerText;
+          if (isSale) {
+            credit += amount;
+          } else {
+            debit += amount;
+          }
+          row.cells[1].innerText = credit;
+          row.cells[2].innerText = debit;
+          row.cells[3].innerText = credit - debit;
+          break;
+        }
+      }
+      if (!found) {
+        let newRow = `<tr>
+          <td>${accountName}</td>
+          <td>${isSale ? amount : 0}</td>
+          <td>${isSale ? 0 : amount}</td>
+          <td>${isSale ? amount : -amount}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+        table.innerHTML += newRow;
+      }
+    }
+    
+    // تحديث كمية صنف معين بعد عملية شراء أو بيع
+    function updateItemQuantity(itemNameStr, qtyChange) {
+      let table = document.getElementById("itemsTable");
+      for (let i = 1; i < table.rows.length; i++) {
+        let row = table.rows[i];
+        if (row.cells[0].innerText === itemNameStr) {
+          let currentQty = +row.cells[3].innerText;
+          row.cells[3].innerText = currentQty + qtyChange;
+          break;
+        }
+      }
+    }
+    
+    // إضافة فاتورة مشتريات
+    function addPurchase() {
+      console.log("addPurchase triggered");
+      const purchaseAccount = document.getElementById("purchaseAccount").value;
+      const purchaseType = document.getElementById("purchaseType").value;
+      const purchaseItem = document.getElementById("purchaseItem").value;
+      const purchaseQty = +document.getElementById("purchaseQty").value;
+      const purchaseUnit = +document.getElementById("purchaseUnit").value;
+      const total = purchaseQty * purchaseUnit;
+      
+      let row = `<tr>
+          <td>${purchaseAccount}</td>
+          <td>${purchaseType}</td>
+          <td>${purchaseItem}</td>
+          <td>${purchaseQty}</td>
+          <td>${purchaseUnit}</td>
+          <td>${total}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("purchasesTable").innerHTML += row;
+      updateItemQuantity(purchaseItem, purchaseQty);
+      updateAccount(purchaseAccount, false, total);
+      saveData();
+    }
+    
+    // إضافة فاتورة مبيعات
+    function addSale() {
+      console.log("addSale triggered");
+      const saleType = document.getElementById("saleType").value;
+      const saleItem = document.getElementById("saleItem").value;
+      const saleQty = +document.getElementById("saleQty").value;
+      
+      let itemsTable = document.getElementById("itemsTable");
+      let found = false;
+      let purchasePrice = 0, salePrice = 0, currentQty = 0;
+      for (let i = 1; i < itemsTable.rows.length; i++) {
+        let row = itemsTable.rows[i];
+        if (row.cells[0].innerText === saleItem) {
+          found = true;
+          purchasePrice = +row.cells[1].innerText;
+          salePrice = +row.cells[2].innerText;
+          currentQty = +row.cells[3].innerText;
+          break;
+        }
+      }
+      if (!found) {
+        return alert("الصنف غير موجود في جدول الأصناف");
+      }
+      if (saleQty > currentQty) {
+        return alert("الكمية غير متوفرة");
+      }
+      
+      const total = saleQty * salePrice;
+      const profit = saleQty * (salePrice - purchasePrice);
+      
+      let row = `<tr>
+          <td>${saleType}</td>
+          <td>${saleItem}</td>
+          <td>${saleQty}</td>
+          <td>${total}</td>
+          <td>${profit}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("salesTable").innerHTML += row;
+      updateItemQuantity(saleItem, -saleQty);
+      // تعديل بسيط:
+      // في المبيعات النقد، لا نقوم بترحيل العملية إلى قسم الحسابات،
+      // لذا تم حذف استدعاء updateAccount("النقد", true, total);
+      saveData();
+    }
+    
+    // إضافة مصروف
+    function addExpense() {
+      console.log("addExpense triggered");
+      const expenseType = document.getElementById("expenseType").value;
+      const expenseAmount = +document.getElementById("expenseAmount").value;
+      
+      let row = `<tr>
+          <td>${expenseType}</td>
+          <td>${expenseAmount}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("expensesTable").innerHTML += row;
+      updateAccount("النقد", false, expenseAmount);
+      saveData();
+    }
+    
+    // إضافة بضاعة متبقية لجرد اليوم
+    function addRemainingStock() {
+      console.log("addRemainingStock triggered");
+      const remainingItem = document.getElementById("remainingItem").value;
+      const remainingQty = +document.getElementById("remainingQty").value;
+      
+      let itemsTable = document.getElementById("itemsTable");
+      let found = false;
+      let price = 0;
+      for (let i = 1; i < itemsTable.rows.length; i++) {
+        let row = itemsTable.rows[i];
+        if (row.cells[0].innerText === remainingItem) {
+          found = true;
+          price = +row.cells[1].innerText;
+          break;
+        }
+      }
+      if (!found) {
+        return alert("الصنف غير موجود في جدول الأصناف");
+      }
+      const total = remainingQty * price;
+      let row = `<tr>
+          <td>${remainingItem}</td>
+          <td>${remainingQty}</td>
+          <td>${total}</td>
+          <td>
+            <button onclick="editRow(this)">تعديل</button>
+            <button onclick="deleteRow(this)">حذف</button>
+          </td>
+        </tr>`;
+      document.getElementById("remainingStockTable").innerHTML += row;
+      saveData();
+    }
+    
+    // إنشاء التقرير اليومي
+    function generateReport() {
+      console.log("generateReport triggered");
+      const cashRemaining = +document.getElementById("cashRemaining").value || 0;
+      let totalSales = 0, totalPurchases = 0, totalExpenses = 0;
+      
+      let salesTable = document.getElementById("salesTable");
+      for (let i = 1; i < salesTable.rows.length; i++) {
+        let row = salesTable.rows[i];
+        totalSales += +row.cells[3].innerText;
+      }
+      
+      let purchasesTable = document.getElementById("purchasesTable");
+      for (let i = 1; i < purchasesTable.rows.length; i++) {
+        let row = purchasesTable.rows[i];
+        totalPurchases += +row.cells[5].innerText;
+      }
+      
+      let expensesTable = document.getElementById("expensesTable");
+      for (let i = 1; i < expensesTable.rows.length; i++) {
+        let row = expensesTable.rows[i];
+        totalExpenses += +row.cells[1].innerText;
+      }
+      
+      // حساب صافي الربح = إجمالي المبيعات - إجمالي المشتريات
+      document.getElementById("netProfit").innerText = `صافي الربح: ${totalSales - totalPurchases}`;
+      // حساب إجمالي شغل اليوم = المبلغ المتبقي في الصندوق + المصاريف
+      document.getElementById("workTotal").innerText = `اجمالي شغل اليوم: ${cashRemaining + totalExpenses}`;
+      document.getElementById("salesTotal").innerText = `إجمالي المبيعات: ${totalSales}`;
+      document.getElementById("purchasesTotal").innerText = `إجمالي المشتريات: ${totalPurchases}`;
+    }
+  </script>
+</body>
+</html>
